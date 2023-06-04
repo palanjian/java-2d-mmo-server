@@ -1,56 +1,53 @@
 package main;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class Player extends Thread {
 	
 	private Socket socket;	
 	private Server server;
-	
-	//printwriter test
-	InputStream inputStream;
-	ObjectInputStream objectInputStream;
+	private ObjectInputStream objectInputStream;
+	private ObjectOutputStream objectOutputStream;
 	
 	public Player(Socket socket, Server server) {
 		this.socket = socket;
 		this.server = server;
 		
-		//printwriter test
 		try {
-			inputStream = socket.getInputStream();
-			objectInputStream = new ObjectInputStream(inputStream);
+			objectOutputStream = new ObjectOutputStream(socket.getOutputStream()); 
+			objectOutputStream.flush();
+			objectInputStream = new ObjectInputStream(socket.getInputStream());
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
 	public void run() {
-		/*
-		 * TEST CODE
-		 * 
-		 */	
 		while(true) {
-			String line;
 			try {
 				PlayerInfo playerInfo = (PlayerInfo) objectInputStream.readObject();
-				System.out.println(playerInfo.username + "'s position: X=" + playerInfo.playerX + " Y=" + playerInfo.playerY);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				server.sendPlayerInfo(playerInfo, this);
+				//System.out.println(playerInfo.username + "'s position: X=" + playerInfo.playerX + " Y=" + playerInfo.playerY);
+			} catch (SocketException socketException) {
+				System.out.println(socket.getInetAddress() + " has disconnected.");
+				server.removePlayer(this);
+				return;
+			} catch (Exception e) {
 				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
+			} 
 		}
-		/*
-		 * TEST CODE
-		 * 
-		 */	
 	}
+	
+	public void sendToClient(PlayerInfo playerInfo) {
+		try {
+			objectOutputStream.writeUnshared(playerInfo);
+			objectOutputStream.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}	
 }

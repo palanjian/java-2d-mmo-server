@@ -21,9 +21,7 @@ public class Player extends Thread {
 			objectOutputStream.flush();
 			objectInputStream = new ObjectInputStream(socket.getInputStream());
 		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
+		catch (Exception e) { e.printStackTrace(); }
 	}
 	
 	public void run() {
@@ -36,9 +34,7 @@ public class Player extends Thread {
 				System.out.println(socket.getInetAddress() + " has disconnected.");
 				server.removePlayer(this);
 				return;
-			} catch (Exception e) {
-				e.printStackTrace();
-			} 
+			} catch (Exception e) { e.printStackTrace(); }
 		}
 	}
 	
@@ -46,8 +42,6 @@ public class Player extends Thread {
 		try {
 			objectOutputStream.writeUnshared(playerInfo);
 			objectOutputStream.flush();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception e) { e.printStackTrace(); }
 	}	
 }

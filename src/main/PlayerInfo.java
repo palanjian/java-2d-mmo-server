@@ -8,19 +8,20 @@ public class PlayerInfo implements Serializable{
 	
 	private int playerX;
 	private int playerY;
-	private String username;
 	private int id;
+	private String direction;
 	
-	public PlayerInfo(int id, String username, int playerX, int playerY) {
-		this.setId(id);
-		this.setUsername(username);
-		this.setPlayerX(playerX);
-		this.setPlayerY(playerY);
+	public PlayerInfo(int id, int playerX, int playerY, String direction) {
+		this.id = id;
+		this.playerX = playerX;
+		this.playerY = playerY;
+		this.direction = direction;
 	}
 	
-	public void updatePosition(int playerX, int playerY) {
+	public void updatePosition(int playerX, int playerY, String direction) {
 		this.setPlayerX(playerX);
 		this.setPlayerY(playerY);
+		this.setDirection(direction);
 	}
 
 	//Getters & Setters
@@ -32,12 +33,12 @@ public class PlayerInfo implements Serializable{
 
 	public void setPlayerY(int playerY) { this.playerY = playerY; }
 
-	public String getUsername() { return username;}
-
-	public void setUsername(String username) { this.username = username; }
-
 	public int getId() { return id; }
 
 	public void setId(int id) { this.id = id; }
-	
+
+	public String getDirection() { return direction; }
+
+	public void setDirection(String direction) { this.direction = direction; }
+
 }

@@ -23,7 +23,7 @@ public class Server {
 				Socket socket = serverSocket.accept(); // blocking function
 				System.out.println("Connection from: " + socket.getInetAddress());
 				Player player = new Player(socket, this);
-				addPlayer(player);
+				addPlayerThread(player);
 				player.start();
 			}			
 		}
@@ -31,26 +31,26 @@ public class Server {
 	}
 	
 	public void sendPlayerInfo(PlayerInfo playerInfo, Player sender) {
-		pAddPlayer(playerInfo);
+		addPlayerInfo(playerInfo);
 		for(Player reciever : playerThreads) {
 			if(reciever != sender) {
 				reciever.sendToClient(playerInfo);
 			}
 		}
 	}
-	public void removePlayer(Player player) {
+	public void removePlayerThread(Player player) {
 		playerThreads.remove(player);
 	}
 	
-	public void addPlayer(Player player) {
+	public void addPlayerThread(Player player) {
 		playerThreads.add(player);
 	}
 	
-	public void pAddPlayer(PlayerInfo player) {
+	public void addPlayerInfo(PlayerInfo player) {
 		allPlayerInfos.put(player.getId(), player); //O(1)
 	}
 	
-	public void pRemovePlayer(PlayerInfo player) {
+	public void removePlayerInfo(PlayerInfo player) {
 		allPlayerInfos.remove(player.getId()); //O(1)
 	}
 	public Map<Integer, PlayerInfo> getAllPlayerInfos(){

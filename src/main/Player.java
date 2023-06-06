@@ -33,11 +33,11 @@ public class Player extends Thread {
 			try {
 				playerInfo = (PlayerInfo) objectInputStream.readObject();
 				server.sendPlayerInfo(playerInfo, this);
-				//System.out.println(playerInfo.username + "'s position: X=" + playerInfo.playerX + " Y=" + playerInfo.playerY);
+				//System.out.println(playerInfo.getId() + "'s position: X=" + playerInfo.getPlayerX() + " Y=" + playerInfo.getPlayerY() + " DIR=" + playerInfo.getDirection());
 			} catch (SocketException socketException) {
 				System.out.println(socket.getInetAddress() + " has disconnected.");
-				server.removePlayer(this); //removes from list of threads
-				server.pRemovePlayer(playerInfo); //removes from list of all playerlocations
+				server.removePlayerThread(this); //removes from list of threads
+				server.removePlayerInfo(playerInfo); //removes from list of all playerlocations
 				return;
 			} catch (Exception e) { e.printStackTrace(); }
 		}

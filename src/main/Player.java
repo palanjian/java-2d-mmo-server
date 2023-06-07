@@ -36,9 +36,15 @@ public class Player extends Thread {
 				//System.out.println(playerInfo.getId() + "'s position: X=" + playerInfo.getPlayerX() + " Y=" + playerInfo.getPlayerY() + " DIR=" + playerInfo.getDirection());
 			} catch (SocketException socketException) {
 				System.out.println(socket.getInetAddress() + " has disconnected.");
+				//tells all clients that the player has disconnected
+				
 				server.removePlayerThread(this); //removes from list of threads
 				server.removePlayerInfo(playerInfo); //removes from list of all playerlocations
+				
+				playerInfo.setOnline(false);
+				server.sendPlayerInfo(playerInfo, this);				
 				return;
+				
 			} catch (Exception e) { e.printStackTrace(); }
 		}
 	}

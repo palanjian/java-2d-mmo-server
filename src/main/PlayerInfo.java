@@ -10,18 +10,25 @@ public class PlayerInfo implements Serializable{
 	private int playerY;
 	private int id;
 	private String direction;
+	private int animState;
+	private byte[] spritesheet;
+	private boolean online;
 	
-	public PlayerInfo(int id, int playerX, int playerY, String direction) {
+	public PlayerInfo(int id, int playerX, int playerY, String direction, int animState, byte[] spritesheet) {
 		this.id = id;
 		this.playerX = playerX;
 		this.playerY = playerY;
 		this.direction = direction;
+		this.spritesheet = spritesheet;
+		this.setAnimState(animState);
+		this.setOnline(true);
 	}
 	
-	public void updatePosition(int playerX, int playerY, String direction) {
-		this.setPlayerX(playerX);
-		this.setPlayerY(playerY);
-		this.setDirection(direction);
+	public void updatePosition(int playerX, int playerY, String direction, int animState) {
+		this.playerX = playerX;
+		this.playerY = playerY;
+		this.direction = direction;
+		this.setAnimState(animState);
 	}
 
 	//Getters & Setters
@@ -41,4 +48,15 @@ public class PlayerInfo implements Serializable{
 
 	public void setDirection(String direction) { this.direction = direction; }
 
+	public byte[] getSpritesheet() { return spritesheet; }
+
+	public void setSpritesheet(byte[] spritesheet) { this.spritesheet = spritesheet; }
+
+	public int getAnimState() { return animState; }
+
+	public void setAnimState(int animState) { this.animState = animState; }
+
+	public boolean getOnline() { return online; }
+
+	public void setOnline(boolean online) { this.online = online; }
 }

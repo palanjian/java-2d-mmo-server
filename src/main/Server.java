@@ -1,15 +1,21 @@
 package main;
 
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import packets.PlayerInfo;
+import packets.TileMap;
+
 public class Server {
 
 	private Vector<Player> playerThreads;
 	private Map<Integer, PlayerInfo> allPlayerInfos;
+	private TileMap tileMap;
+	String DEFAULT_MAP = "/maps/map01.txt";
 	
 	public Server(int port) {
 		try {
@@ -18,6 +24,13 @@ public class Server {
 			System.out.println("Bound to port " + port + ". Now waiting for connections.");
 			playerThreads = new Vector<Player>();
 			allPlayerInfos = new HashMap<Integer, PlayerInfo>();
+			
+			//Sets default tileMap
+			InputStream is = getClass().getResourceAsStream(DEFAULT_MAP);
+			tileMap = new TileMap(is);
+			
+			CommandHandler commandHandler = new CommandHandler(this);
+			commandHandler.start();
 			
 			while(true) {
 				Socket socket = serverSocket.accept(); // blocking function
@@ -38,6 +51,15 @@ public class Server {
 			}
 		}
 	}
+	
+	public void sendTileMap(TileMap tileMap) {
+		System.out.println("Sending tilemap to all players.");
+		this.tileMap = tileMap;
+		for(Player reciever : playerThreads) {
+			reciever.sendTileMap(tileMap);
+		}
+	}
+	
 	public void removePlayerThread(Player player) {
 		playerThreads.remove(player);
 	}
@@ -56,6 +78,7 @@ public class Server {
 	public Map<Integer, PlayerInfo> getAllPlayerInfos(){
 		return allPlayerInfos;
 	}
+	public TileMap getTileMap() { return tileMap; }
 	
 }
 

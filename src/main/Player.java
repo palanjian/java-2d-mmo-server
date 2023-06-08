@@ -5,6 +5,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 
+import packets.PlayerInfo;
+import packets.TileMap;
+
 public class Player extends Thread {
 	
 	private Socket socket;	
@@ -27,7 +30,6 @@ public class Player extends Thread {
 	public void run() {
 		//begins by sending the prexisting information of all other players to the client
 		initializePlayerInfos();
-		
 		while(true) {
 			try {
 				playerInfo = (PlayerInfo) objectInputStream.readObject();
@@ -59,5 +61,13 @@ public class Player extends Thread {
 		for(PlayerInfo playerInfo : server.getAllPlayerInfos().values()) {
 			sendToClient(playerInfo);
 		}
+		sendTileMap(server.getTileMap());
+	}
+
+	public void sendTileMap(TileMap tileMap) {
+		try {
+			objectOutputStream.writeUnshared(tileMap);
+			objectOutputStream.flush();
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 }

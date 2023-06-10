@@ -6,7 +6,6 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-
 import packets.PlayerInfo;
 import packets.TileMap;
 
@@ -15,7 +14,7 @@ public class Server {
 	private Vector<Player> playerThreads;
 	private Map<Integer, PlayerInfo> allPlayerInfos;
 	private TileMap tileMap;
-	String DEFAULT_MAP = "/maps/map01.txt";
+	private String DEFAULT_MAP = "/maps/map01.txt";
 	
 	public Server(int port) {
 		try {
@@ -75,10 +74,11 @@ public class Server {
 	public void removePlayerInfo(PlayerInfo player) {
 		allPlayerInfos.remove(player.getId()); //O(1)
 	}
+	
 	public Map<Integer, PlayerInfo> getAllPlayerInfos(){
 		return allPlayerInfos;
 	}
-	public TileMap getTileMap() { return tileMap; }
 	
+	public TileMap getTileMap() { return tileMap; }
 }
 

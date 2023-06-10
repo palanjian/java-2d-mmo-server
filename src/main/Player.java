@@ -4,7 +4,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-
 import packets.PlayerInfo;
 import packets.TileMap;
 
@@ -28,7 +27,7 @@ public class Player extends Thread {
 	}
 	
 	public void run() {
-		//begins by sending the prexisting information of all other players to the client
+		//Begins by sending the prexisting information of all other players to the client
 		initializePlayerInfos();
 		while(true) {
 			try {
@@ -40,7 +39,7 @@ public class Player extends Thread {
 				//tells all clients that the player has disconnected
 				
 				server.removePlayerThread(this); //removes from list of threads
-				server.removePlayerInfo(playerInfo); //removes from list of all playerlocations
+				server.removePlayerInfo(playerInfo); //removes from list of all playerinfos
 				
 				playerInfo.setOnline(false);
 				server.sendPlayerInfo(playerInfo, this);				

@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+
+import packets.ChatMessage;
 import packets.PlayerInfo;
 import packets.TileMap;
 
@@ -56,6 +58,13 @@ public class Server {
 		this.tileMap = tileMap;
 		for(Player reciever : playerThreads) {
 			reciever.sendTileMap(tileMap);
+		}
+	}
+	
+	public void sendChatMessage(ChatMessage chatMessage) {
+		chatMessage.setTimeSent(System.currentTimeMillis());
+		for(Player reciever : playerThreads) {
+			reciever.sendChatMessage(chatMessage);
 		}
 	}
 	

@@ -4,6 +4,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+
+import packets.ChatMessage;
 import packets.PlayerInfo;
 import packets.TileMap;
 
@@ -31,9 +33,17 @@ public class Player extends Thread {
 		initializePlayerInfos();
 		while(true) {
 			try {
-				playerInfo = (PlayerInfo) objectInputStream.readObject();
-				server.sendPlayerInfo(playerInfo, this);
-				//System.out.println(playerInfo.getId() + "'s position: X=" + playerInfo.getPlayerX() + " Y=" + playerInfo.getPlayerY() + " DIR=" + playerInfo.getDirection());
+				Object o = objectInputStream.readObject();
+				if (o instanceof PlayerInfo) {
+				    playerInfo = (PlayerInfo)o;
+					server.sendPlayerInfo(playerInfo, this);
+					//System.out.println(playerInfo.getId() + "'s position: X=" + playerInfo.getPlayerX() + " Y=" + playerInfo.getPlayerY() + " DIR=" + playerInfo.getDirection());
+				}
+				else if(o instanceof ChatMessage) {
+					ChatMessage chatMessage = (ChatMessage)o;
+					server.sendChatMessage(chatMessage);
+					
+				}
 			} catch (SocketException socketException) {
 				System.out.println(socket.getInetAddress() + " has disconnected.");
 				//tells all clients that the player has disconnected
@@ -66,6 +76,13 @@ public class Player extends Thread {
 	public void sendTileMap(TileMap tileMap) {
 		try {
 			objectOutputStream.writeUnshared(tileMap);
+			objectOutputStream.flush();
+		} catch (Exception e) { e.printStackTrace(); }
+	}
+	
+	public void sendChatMessage(ChatMessage chatMessage) {
+		try {
+			objectOutputStream.writeUnshared(chatMessage);
 			objectOutputStream.flush();
 		} catch (Exception e) { e.printStackTrace(); }
 	}

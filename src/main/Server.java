@@ -61,11 +61,11 @@ public class Server {
 		}
 	}
 	
-	public void sendChatMessage(ChatMessage chatMessage) {
-		chatMessage.setTimeSent(System.currentTimeMillis());
+	public void sendChatMessage(ChatMessage chatMessage) {	
 		for(Player reciever : playerThreads) {
 			reciever.sendChatMessage(chatMessage);
 		}
+		System.out.println(chatMessage.getSender() + " says: " + chatMessage.getMessage());
 	}
 	
 	public void removePlayerThread(Player player) {

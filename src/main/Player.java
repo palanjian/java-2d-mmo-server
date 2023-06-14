@@ -39,10 +39,9 @@ public class Player extends Thread {
 					server.sendPlayerInfo(playerInfo, this);
 					//System.out.println(playerInfo.getId() + "'s position: X=" + playerInfo.getPlayerX() + " Y=" + playerInfo.getPlayerY() + " DIR=" + playerInfo.getDirection());
 				}
-				else if(o instanceof ChatMessage) {
+				else if (o instanceof ChatMessage) {
 					ChatMessage chatMessage = (ChatMessage)o;
 					server.sendChatMessage(chatMessage);
-					
 				}
 			} catch (SocketException socketException) {
 				System.out.println(socket.getInetAddress() + " has disconnected.");

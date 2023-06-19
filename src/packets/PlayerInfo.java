@@ -13,9 +13,11 @@ public class PlayerInfo implements Serializable{
 	private int animState;
 	private byte[] spritesheet;
 	private boolean online;
+	private String username;
 	
-	public PlayerInfo(int id, int playerX, int playerY, String direction, int animState, byte[] spritesheet) {
+	public PlayerInfo(int id, String username, int playerX, int playerY, String direction, int animState, byte[] spritesheet) {
 		this.id = id;
+		this.username = username;
 		this.playerX = playerX;
 		this.playerY = playerY;
 		this.direction = direction;
@@ -59,4 +61,8 @@ public class PlayerInfo implements Serializable{
 	public boolean getOnline() { return online; }
 
 	public void setOnline(boolean online) { this.online = online; }
+
+	public String getUsername() { return username; }
+
+	public void setUsername(String username) { this.username = username; }
 }

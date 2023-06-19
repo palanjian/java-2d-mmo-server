@@ -17,6 +17,8 @@ public class Player extends Thread {
 	private ObjectOutputStream objectOutputStream;
 	PlayerInfo playerInfo;
 	
+	private boolean firstLogin = true; //flag
+	
 	public Player(Socket socket, Server server) {
 		this.socket = socket;
 		this.server = server;
@@ -38,6 +40,12 @@ public class Player extends Thread {
 				    playerInfo = (PlayerInfo)o;
 					server.sendPlayerInfo(playerInfo, this);
 					//System.out.println(playerInfo.getId() + "'s position: X=" + playerInfo.getPlayerX() + " Y=" + playerInfo.getPlayerY() + " DIR=" + playerInfo.getDirection());
+					
+					//sends join message using firstLogin flag
+					if(firstLogin) {
+						sendJoinMessage();
+						firstLogin = false;
+					}
 				}
 				else if (o instanceof ChatMessage) {
 					ChatMessage chatMessage = (ChatMessage)o;
@@ -51,13 +59,26 @@ public class Player extends Thread {
 				server.removePlayerInfo(playerInfo); //removes from list of all playerinfos
 				
 				playerInfo.setOnline(false);
-				server.sendPlayerInfo(playerInfo, this);				
+				server.sendPlayerInfo(playerInfo, this);
+				sendLeaveMessage();
 				return;
 				
 			} catch (Exception e) { e.printStackTrace(); }
 		}
 	}
 	
+	private void sendJoinMessage() {
+		String string = playerInfo.getUsername() + " has joined the server.";
+		ChatMessage message = new ChatMessage(string, "Server");
+		server.sendChatMessage(message);
+	}
+	
+	private void sendLeaveMessage() {
+		String string = playerInfo.getUsername() + " has left the server.";
+		ChatMessage message = new ChatMessage(string, "Server");
+		server.sendChatMessage(message);
+	}
+
 	public void sendToClient(PlayerInfo playerInfo) {
 		try {
 			objectOutputStream.writeUnshared(playerInfo);

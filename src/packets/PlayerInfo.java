@@ -14,6 +14,7 @@ public class PlayerInfo implements Serializable{
 	private byte[] spritesheet;
 	private boolean online;
 	private String username;
+	private String pet;
 	
 	public PlayerInfo(int id, String username, int playerX, int playerY, String direction, int animState, byte[] spritesheet) {
 		this.id = id;
@@ -24,6 +25,7 @@ public class PlayerInfo implements Serializable{
 		this.spritesheet = spritesheet;
 		this.setAnimState(animState);
 		this.setOnline(true);
+		this.setPet(null);
 	}
 	
 	public void updatePosition(int playerX, int playerY, String direction, int animState) {
@@ -65,4 +67,8 @@ public class PlayerInfo implements Serializable{
 	public String getUsername() { return username; }
 
 	public void setUsername(String username) { this.username = username; }
+
+	public String getPet() { return pet; }
+
+	public void setPet(String pet) { this.pet = pet; }
 }

@@ -2,3 +2,4 @@
 .metadata
 bin/
 res/maps
+/target/

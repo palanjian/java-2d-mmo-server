@@ -16,7 +16,7 @@ public class Server {
 	private Vector<Player> playerThreads;
 	private Map<Integer, PlayerInfo> allPlayerInfos;
 	private TileMap tileMap;
-	private String DEFAULT_MAP = "/maps/map01.txt";
+	private String DEFAULT_MAP = "/maps/island.txt";
 	
 	public Server(int port) {
 		try {

@@ -1,5 +1,5 @@
 .settings
 .metadata
 bin/
-res/maps
 /target/
+.idea/

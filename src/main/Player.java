@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import packets.ChatMessage;
+import packets.EntityInfo;
 import packets.PlayerInfo;
 import packets.TileMap;
 
@@ -33,11 +34,14 @@ public class Player extends Thread {
 	public void run() {
 		//Begins by sending the prexisting information of all other players to the client
 		initializePlayerInfos();
+		initializeEntityInfos();
+		initializeTileMap();
+
 		while(true) {
 			try {
 				Object o = objectInputStream.readObject();
-				if (o instanceof PlayerInfo) {
-				    playerInfo = (PlayerInfo)o;
+				if (o instanceof PlayerInfo p) {
+					playerInfo = p;
 					server.sendPlayerInfo(playerInfo, this);
 					//System.out.println(playerInfo.getId() + "'s position: X=" + playerInfo.getPlayerX() + " Y=" + playerInfo.getPlayerY() + " DIR=" + playerInfo.getDirection());
 					
@@ -47,17 +51,29 @@ public class Player extends Thread {
 						firstLogin = false;
 					}
 				}
-				else if (o instanceof ChatMessage) {
-					ChatMessage chatMessage = (ChatMessage)o;
+				if(o instanceof EntityInfo entityInfo){
+					server.sendEntityInfo(entityInfo);
+				}
+
+				else if (o instanceof ChatMessage chatMessage) {
 					server.sendChatMessage(chatMessage);
 				}
+
 			} catch (SocketException socketException) {
 				System.out.println(socket.getInetAddress() + " has disconnected.");
 				//tells all clients that the player has disconnected
 				
 				server.removePlayerThread(this); //removes from list of threads
 				server.removePlayerInfo(playerInfo); //removes from list of all playerinfos
-				
+
+				//removes players pet (if they have one)
+				EntityInfo petInfo = server.getEntityById(playerInfo.getId());
+				if(petInfo != null){
+					server.removeEntityInfo(petInfo);
+					petInfo.setOnline(false);
+					server.sendEntityInfo(petInfo);
+				}
+
 				playerInfo.setOnline(false);
 				server.sendPlayerInfo(playerInfo, this);
 				sendLeaveMessage();
@@ -79,17 +95,26 @@ public class Player extends Thread {
 		server.sendChatMessage(message);
 	}
 
-	public void sendToClient(PlayerInfo playerInfo) {
+	public void sendToClient(Object o) {
 		try {
-			objectOutputStream.writeUnshared(playerInfo);
+			objectOutputStream.writeUnshared(o);
 			objectOutputStream.flush();
 		} catch (Exception e) { e.printStackTrace(); }
-	}	
+	}
 	
 	public void initializePlayerInfos(){
 		for(PlayerInfo playerInfo : server.getAllPlayerInfos().values()) {
 			sendToClient(playerInfo);
 		}
+	}
+
+	public void initializeEntityInfos(){
+		for(EntityInfo entityInfo : server.getAllEntityInfos().values()) {
+			sendToClient(entityInfo);
+		}
+		sendTileMap(server.getTileMap());
+	}
+	public void initializeTileMap(){
 		sendTileMap(server.getTileMap());
 	}
 

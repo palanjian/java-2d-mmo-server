@@ -1,5 +1,7 @@
 package packets;
 
+import enums.Direction;
+
 import java.io.Serializable;
 
 public class PlayerInfo implements Serializable{
@@ -9,13 +11,13 @@ public class PlayerInfo implements Serializable{
 	private int playerX;
 	private int playerY;
 	private int id;
-	private String direction;
+	private Direction direction;
 	private int animState;
 	private byte[] spritesheet;
 	private boolean online;
 	private String username;
 
-	public PlayerInfo(int id, String username, int playerX, int playerY, String direction, int animState, byte[] spritesheet) {
+	public PlayerInfo(int id, String username, int playerX, int playerY, Direction direction, int animState, byte[] spritesheet) {
 		this.id = id;
 		this.username = username;
 		this.playerX = playerX;
@@ -26,7 +28,7 @@ public class PlayerInfo implements Serializable{
 		this.setOnline(true);
 	}
 	
-	public void updatePosition(int playerX, int playerY, String direction, int animState) {
+	public void updatePosition(int playerX, int playerY, Direction direction, int animState) {
 		this.playerX = playerX;
 		this.playerY = playerY;
 		this.direction = direction;
@@ -45,9 +47,9 @@ public class PlayerInfo implements Serializable{
 
 	public void setId(int id) { this.id = id; }
 
-	public String getDirection() { return direction; }
+	public Direction getDirection() { return direction; }
 
-	public void setDirection(String direction) { this.direction = direction; }
+	public void setDirection(Direction direction) { this.direction = direction; }
 
 	public byte[] getSpritesheet() { return spritesheet; }
 

@@ -9,15 +9,20 @@ import java.util.Vector;
 
 import packets.ChatMessage;
 import packets.EntityInfo;
-import packets.PlayerInfo;
 import packets.TileMap;
+
+import static enums.EntityType.PLAYER;
 
 public class Server {
 
 	private Vector<Player> playerThreads;
 
+	//on the client, we treat all entities the same, as all we need to do
+	//is render them. however, on the server, we store players in their own container
+	//as we may need quick lookup of explicitly players for things like combat
 	private Map<Integer, EntityInfo> allEntityInfos;
-	private Map<Integer, PlayerInfo> allPlayerInfos;
+	private Map<Integer, EntityInfo> allPlayerInfos;
+
 	private TileMap tileMap;
 	private String DEFAULT_MAP = "/maps/island.txt";
 	
@@ -27,7 +32,7 @@ public class Server {
 			ServerSocket serverSocket = new ServerSocket(port);
 			System.out.println("Bound to port " + port + ". Now waiting for connections.");
 			playerThreads = new Vector<Player>();
-			allPlayerInfos = new HashMap<Integer, PlayerInfo>();
+			allPlayerInfos = new HashMap<Integer, EntityInfo>();
 			allEntityInfos = new HashMap<Integer, EntityInfo>();
 
 			//Sets default tileMap
@@ -48,20 +53,12 @@ public class Server {
 		catch (Exception e) { System.out.println(e.getMessage()); }
 	}
 	
-	public void sendPlayerInfo(PlayerInfo playerInfo, Player sender) {
-		addPlayerInfo(playerInfo);
+	public void sendEntityInfo(EntityInfo entityInfo, Player sender) {
+		if(entityInfo.getType() == PLAYER) addPlayerInfo(entityInfo);
+		else addEntityInfo(entityInfo);
+
 		for(Player reciever : playerThreads) {
 			if(reciever != sender) {
-				reciever.sendToClient(playerInfo);
-			}
-		}
-	}
-	public void sendEntityInfo(EntityInfo entityInfo) {
-		addEntityInfo(entityInfo);
-		for(Player reciever : playerThreads) {
-			if(reciever.playerInfo.getId() != entityInfo.getId()){
-				//we dont send pet info to the player who owns the pet
-				//we use the same id to connect the two (player and pet share ID)
 				reciever.sendToClient(entityInfo);
 			}
 		}
@@ -90,15 +87,15 @@ public class Server {
 		playerThreads.add(player);
 	}
 	
-	public void addPlayerInfo(PlayerInfo player) {
+	public void addPlayerInfo(EntityInfo player) {
 		allPlayerInfos.put(player.getId(), player); //O(1)
 	}
 	
-	public void removePlayerInfo(PlayerInfo player) {
+	public void removePlayerInfo(EntityInfo player) {
 		allPlayerInfos.remove(player.getId()); //O(1)
 	}
 	
-	public Map<Integer, PlayerInfo> getAllPlayerInfos(){
+	public Map<Integer, EntityInfo> getAllPlayerInfos(){
 		return allPlayerInfos;
 	}
 	
@@ -114,10 +111,7 @@ public class Server {
 	}
 
 	public EntityInfo getEntityById(int id) {
-		for(EntityInfo entityInfo : allEntityInfos.values()){
-			if(entityInfo.getId() == id) return entityInfo;
-		}
-		return null;
+		return allEntityInfos.get(id);
 	}
 }
 

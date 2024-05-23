@@ -7,8 +7,9 @@ import java.net.SocketException;
 
 import packets.ChatMessage;
 import packets.EntityInfo;
-import packets.PlayerInfo;
 import packets.TileMap;
+
+import static enums.EntityType.PLAYER;
 
 public class Player extends Thread {
 	
@@ -16,7 +17,7 @@ public class Player extends Thread {
 	private Server server;
 	private ObjectInputStream objectInputStream;
 	private ObjectOutputStream objectOutputStream;
-	PlayerInfo playerInfo;
+	EntityInfo playerInfo;
 	
 	private boolean firstLogin = true; //flag
 	
@@ -40,9 +41,9 @@ public class Player extends Thread {
 		while(true) {
 			try {
 				Object o = objectInputStream.readObject();
-				if (o instanceof PlayerInfo p) {
+				if (o instanceof EntityInfo p && p.getType() == PLAYER) {
 					playerInfo = p;
-					server.sendPlayerInfo(playerInfo, this);
+					server.sendEntityInfo(playerInfo, this);
 					//System.out.println(playerInfo.getId() + "'s position: X=" + playerInfo.getPlayerX() + " Y=" + playerInfo.getPlayerY() + " DIR=" + playerInfo.getDirection());
 					
 					//sends join message using firstLogin flag
@@ -51,8 +52,8 @@ public class Player extends Thread {
 						firstLogin = false;
 					}
 				}
-				if(o instanceof EntityInfo entityInfo){
-					server.sendEntityInfo(entityInfo);
+				else if(o instanceof EntityInfo entityInfo){
+					server.sendEntityInfo(entityInfo, this);
 				}
 
 				else if (o instanceof ChatMessage chatMessage) {
@@ -67,15 +68,16 @@ public class Player extends Thread {
 				server.removePlayerInfo(playerInfo); //removes from list of all playerinfos
 
 				//removes players pet (if they have one)
-				EntityInfo petInfo = server.getEntityById(playerInfo.getId());
+				EntityInfo petInfo = server.getEntityById(playerInfo.getId() + 5000);
 				if(petInfo != null){
-					server.removeEntityInfo(petInfo);
 					petInfo.setOnline(false);
-					server.sendEntityInfo(petInfo);
+					server.sendEntityInfo(petInfo, this);
+					server.removeEntityInfo(petInfo);
 				}
 
 				playerInfo.setOnline(false);
-				server.sendPlayerInfo(playerInfo, this);
+				server.sendEntityInfo(playerInfo, this);
+				server.removePlayerInfo(playerInfo);
 				sendLeaveMessage();
 				return;
 				
@@ -103,7 +105,7 @@ public class Player extends Thread {
 	}
 	
 	public void initializePlayerInfos(){
-		for(PlayerInfo playerInfo : server.getAllPlayerInfos().values()) {
+		for(EntityInfo playerInfo : server.getAllPlayerInfos().values()) {
 			sendToClient(playerInfo);
 		}
 	}

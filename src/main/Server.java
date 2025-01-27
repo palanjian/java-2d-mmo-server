@@ -10,6 +10,8 @@ import java.util.Vector;
 import packets.ChatMessage;
 import packets.EntityInfo;
 import packets.TileMap;
+import worlds.TempWorldHandler;
+import worlds.World;
 
 import static enums.EntityType.PLAYER;
 
@@ -22,10 +24,11 @@ public class Server {
 	//as we may need quick lookup of explicitly players for things like combat
 	private Map<Integer, EntityInfo> allEntityInfos;
 	private Map<Integer, EntityInfo> allPlayerInfos;
+	private Map<Integer, byte[]> allSpriteSheets;
 
-	private TileMap tileMap;
-	private String DEFAULT_MAP = "/maps/island.txt";
-	
+	private Map<String, World> allWorlds;
+	public static World DEFAULT_WORLD;
+
 	public Server(int port) {
 		try {
 			System.out.println("Binding to port " + port);
@@ -34,11 +37,11 @@ public class Server {
 			playerThreads = new Vector<Player>();
 			allPlayerInfos = new HashMap<Integer, EntityInfo>();
 			allEntityInfos = new HashMap<Integer, EntityInfo>();
+			allSpriteSheets = new HashMap<>();
 
-			//Sets default tileMap
-			InputStream is = getClass().getResourceAsStream(DEFAULT_MAP);
-			tileMap = new TileMap(is);
-			
+			allWorlds = TempWorldHandler.initializeAllWorlds();
+			DEFAULT_WORLD = allWorlds.get(TempWorldHandler.getDefaultWorldName());
+
 			CommandHandler commandHandler = new CommandHandler(this);
 			commandHandler.start();
 			
@@ -57,61 +60,60 @@ public class Server {
 		if(entityInfo.getType() == PLAYER) addPlayerInfo(entityInfo);
 		else addEntityInfo(entityInfo);
 
-		for(Player reciever : playerThreads) {
+		if(entityInfo.getSpritesheet() != null) allSpriteSheets.put(entityInfo.getId(), entityInfo.getSpritesheet());
+
+		World world = sender.getWorld();
+		for(Player reciever : world.getPlayerThreads()) {
 			if(reciever != sender) {
+				entityInfo.setSpritesheet(allSpriteSheets.get(entityInfo.getId()));
 				reciever.sendToClient(entityInfo);
 			}
 		}
 	}
 
-	public void sendTileMap(TileMap tileMap) {
-		System.out.println("Sending tilemap to all players.");
-		this.tileMap = tileMap;
-		for(Player reciever : playerThreads) {
-			reciever.sendTileMap(tileMap);
-		}
-	}
-	
-	public void sendChatMessage(ChatMessage chatMessage) {	
-		for(Player reciever : playerThreads) {
-			reciever.sendChatMessage(chatMessage);
+	public void sendChatMessage(ChatMessage chatMessage, World world) {
+		for(Player reciever : world.getPlayerThreads()) {
+			reciever.sendToClient(chatMessage);
 		}
 		System.out.println(chatMessage.getSender() + " says: " + chatMessage.getMessage());
 	}
-	
-	public void removePlayerThread(Player player) {
-		playerThreads.remove(player);
+	public void sendTileMap(TileMap tileMap, World world) {
+		System.out.println("Sending tilemap to players in world: " + world.getName());
+		world.setTileMap(tileMap);
+		for(Player reciever : world.getPlayerThreads()) {
+			reciever.sendToClient(tileMap);
+		}
 	}
-	
+
 	public void addPlayerThread(Player player) {
+		player.getWorld().addPlayerThread(player);
 		playerThreads.add(player);
 	}
-	
-	public void addPlayerInfo(EntityInfo player) {
-		allPlayerInfos.put(player.getId(), player); //O(1)
+
+	public void removePlayerThread(Player player) {
+		player.getWorld().removePlayerThread(player);
+		playerThreads.remove(player);
 	}
+
+	public void addPlayerInfo(EntityInfo player) { allPlayerInfos.put(player.getId(), player); }
 	
 	public void removePlayerInfo(EntityInfo player) {
 		allPlayerInfos.remove(player.getId()); //O(1)
 	}
-	
-	public Map<Integer, EntityInfo> getAllPlayerInfos(){
-		return allPlayerInfos;
-	}
-	
-	public TileMap getTileMap() { return tileMap; }
 
 	public void addEntityInfo(EntityInfo entity) {
 		allEntityInfos.put(entity.getId(), entity); //O(1)
 	}
 	public void removeEntityInfo(EntityInfo entity) { allEntityInfos.remove(entity.getId()); }
 
-	public Map<Integer, EntityInfo> getAllEntityInfos(){
-		return allEntityInfos;
-	}
 
 	public EntityInfo getEntityById(int id) {
 		return allEntityInfos.get(id);
 	}
+	public EntityInfo getPlayerById(int id) {
+		return allPlayerInfos.get(id);
+	}
+	public byte[] getSpriteSheetById(int id){ return allSpriteSheets.get(id); }
+	public World getWorld(String worldName) { return allWorlds.get(worldName); }
 }
 

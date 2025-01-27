@@ -4,6 +4,7 @@ import main.Player;
 import packets.EntityInfo;
 import packets.TileMap;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -11,12 +12,13 @@ import java.util.Set;
 public class World {
     private String name;
     private TileMap tileMap;
-    private Map<String, String> teleportPoints;
     //is HashSet threadsafe? Don't think so
     private Set<Integer> playersInWorld;
     private Set<Integer> entitiesInWorld;
     private Set<Player> playerThreadsInWorld;
 
+    //maps teleportKey to teleportpoint
+    private Map<String, TeleportPoint> teleportPoints;
 
     public World(String name, TileMap defaultTileMap){
         this.name = name;
@@ -24,10 +26,15 @@ public class World {
         playersInWorld = new HashSet<>();
         entitiesInWorld = new HashSet<>();
         playerThreadsInWorld = new HashSet<>();
+        teleportPoints = new HashMap<>();
     }
-    public void setTeleportPoints(Map<String, String> map){
-        this.teleportPoints = map;
+
+    public TeleportPoint getTeleportPoint(int x, int y){
+        String id = x + ":" + y;
+        if(teleportPoints.get(id) == null) return null;
+        return teleportPoints.get(id);
     }
+
     public String getName() { return name; }
 
     public Set<Integer> getPlayersInWorld(){ return playersInWorld; }
@@ -47,5 +54,7 @@ public class World {
 
     public void removePlayerId(int id) { playersInWorld.remove(id); }
     public void removeEntityId(int id) { entitiesInWorld.remove(id); }
-
+    public void addTeleportPoint(TeleportPoint tp){
+        teleportPoints.put(tp.getTeleportKey(), tp);
+    }
 }

@@ -65,6 +65,7 @@ public class Server {
 		World world = sender.getWorld();
 		for(Player reciever : world.getPlayerThreads()) {
 			if(reciever != sender) {
+				entityInfo.setSpritesheet(allSpriteSheets.get(entityInfo.getId()));
 				reciever.sendToClient(entityInfo);
 			}
 		}
@@ -93,7 +94,6 @@ public class Server {
 		player.getWorld().removePlayerThread(player);
 		playerThreads.remove(player);
 	}
-
 
 	public void addPlayerInfo(EntityInfo player) { allPlayerInfos.put(player.getId(), player); }
 	

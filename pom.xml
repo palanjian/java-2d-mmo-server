@@ -8,6 +8,9 @@
     <resources>
       <resource>
         <directory>res</directory>
+        <includes>
+          <include>**/*.png</include>
+        </includes>
         <excludes>
           <exclude>**/*.java</exclude>
         </excludes>

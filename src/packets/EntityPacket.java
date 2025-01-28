@@ -5,7 +5,7 @@ import enums.EntityType;
 
 import java.io.Serializable;
 
-public class EntityInfo implements Serializable{
+public class EntityPacket implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
@@ -21,7 +21,7 @@ public class EntityInfo implements Serializable{
 	private boolean online;
 	private String username;
 
-	public EntityInfo(EntityType type, int id, int worldX, int worldY, Direction direction, int spriteNumber, byte[] spritesheet, String username) {
+	public EntityPacket(EntityType type, int id, int worldX, int worldY, Direction direction, int spriteNumber, byte[] spritesheet, String username) {
 		this.type = type;
 		this.id = id;
 		this.worldX = worldX;

@@ -2,5 +2,5 @@ package enums;
 
 public enum EntityType {
     PLAYER,
-    PET
+    RESOURCE
 }

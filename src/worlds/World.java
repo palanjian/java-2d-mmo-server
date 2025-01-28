@@ -1,7 +1,6 @@
 package worlds;
 
 import main.Player;
-import packets.EntityInfo;
 import packets.TileMap;
 
 import java.util.HashMap;

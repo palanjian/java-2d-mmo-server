@@ -46,22 +46,26 @@ public class CommandHandler extends Thread{
 				} catch(Exception e){ System.out.println("Error sending message."); }
 			}
 			//create some random placeholder entity at X, Y
-			//usage = se (world_name) (x_pos) (y_pos)
+			//usage = se (world_name) (x_pos) (y_pos) (name_of_entity (w/o ..._SPRITESHEET))
 			//x and y are of the form ex 1620 and 1340, not 16 and 14 btw
 			else if(arguments[0].equals("sendentity") || arguments[0].equals("se")){
 				World world = server.getWorld(arguments[1]);
 				if(world == null){
 					System.out.println("Unknown world");
-					return;
+					continue;
 				}
 				int x = Integer.parseInt(arguments[2]);
 				int y = Integer.parseInt(arguments[3]);
-				Random rand = new Random();
-				String entitySkinFileName = "COW_SPRITESHEET";
-				EntityPacket ep = new EntityPacket(EntityType.RESOURCE, rand.nextInt(), x, y, Direction.DOWN, 0,
-						GraphicsUtil.bufferedImageToBytes(GraphicsUtil.loadImage(entitySkinFileName), "PNG"), "Doja");
+				String entityName = arguments[4].toUpperCase();
 
+				Random rand = new Random();
+				String skinFileName = entityName + "_SPRITESHEET";
+				EntityPacket ep = new EntityPacket(EntityType.RESOURCE, 43221, x, y, Direction.DOWN, 0,
+						GraphicsUtil.bufferedImageToBytes(GraphicsUtil.loadImage(skinFileName), "PNG"), "Lvl 1");
+
+				server.addEntityInfo(ep);
 				server.sendEntityPacketToWorld(ep, world);
+				System.out.println("Spawned a " + entityName + " in world " + world.getName());
 			}
 			else System.out.println("Unrecognized command.");
 		}

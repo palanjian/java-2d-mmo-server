@@ -52,7 +52,7 @@ public class Server {
 				player.start();
 			}			
 		}
-		catch (Exception e) { System.out.println(e.getMessage()); }
+		catch (Exception e) { e.printStackTrace(); }
 	}
 	
 	public void sendEntityInfo(EntityPacket entityPacket, Player sender) {
